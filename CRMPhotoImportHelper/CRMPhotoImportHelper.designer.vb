@@ -36,10 +36,15 @@ Partial Class CRMPhotoImportHelper
 		Me.lblStatus = New System.Windows.Forms.Label()
 		Me.lblNumInvalid = New System.Windows.Forms.Label()
 		Me.Label4 = New System.Windows.Forms.Label()
-		Me.cmdCopyList = New System.Windows.Forms.Button()
 		Me.Button1 = New System.Windows.Forms.Button()
 		Me.Label3 = New System.Windows.Forms.Label()
 		Me.txtImportFileFolderName = New System.Windows.Forms.TextBox()
+		Me.Label5 = New System.Windows.Forms.Label()
+		Me.cbPictureTitle = New System.Windows.Forms.ComboBox()
+		Me.Label6 = New System.Windows.Forms.Label()
+		Me.txtBlackbaudPhotoLocation = New System.Windows.Forms.TextBox()
+		Me.Label7 = New System.Windows.Forms.Label()
+		Me.txtMaxPhotos = New System.Windows.Forms.TextBox()
 		Me.SuspendLayout()
 		'
 		'lblNumProcessed
@@ -64,7 +69,7 @@ Partial Class CRMPhotoImportHelper
 		'
 		Me.txtSourceFolderName.Location = New System.Drawing.Point(12, 389)
 		Me.txtSourceFolderName.Name = "txtSourceFolderName"
-		Me.txtSourceFolderName.Size = New System.Drawing.Size(503, 20)
+		Me.txtSourceFolderName.Size = New System.Drawing.Size(534, 20)
 		Me.txtSourceFolderName.TabIndex = 4
 		'
 		'cmdProcessFolder
@@ -84,7 +89,7 @@ Partial Class CRMPhotoImportHelper
 		Me.rtbMessage.Location = New System.Drawing.Point(11, 94)
 		Me.rtbMessage.Name = "rtbMessage"
 		Me.rtbMessage.ReadOnly = True
-		Me.rtbMessage.Size = New System.Drawing.Size(375, 263)
+		Me.rtbMessage.Size = New System.Drawing.Size(375, 181)
 		Me.rtbMessage.TabIndex = 6
 		Me.rtbMessage.Text = ""
 		'
@@ -117,7 +122,7 @@ Partial Class CRMPhotoImportHelper
 		'
 		'cmdBrowseFolder
 		'
-		Me.cmdBrowseFolder.Location = New System.Drawing.Point(521, 389)
+		Me.cmdBrowseFolder.Location = New System.Drawing.Point(552, 387)
 		Me.cmdBrowseFolder.Name = "cmdBrowseFolder"
 		Me.cmdBrowseFolder.Size = New System.Drawing.Size(24, 22)
 		Me.cmdBrowseFolder.TabIndex = 10
@@ -127,7 +132,7 @@ Partial Class CRMPhotoImportHelper
 		'cmdCancel
 		'
 		Me.cmdCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-		Me.cmdCancel.Location = New System.Drawing.Point(467, 467)
+		Me.cmdCancel.Location = New System.Drawing.Point(471, 467)
 		Me.cmdCancel.Name = "cmdCancel"
 		Me.cmdCancel.Size = New System.Drawing.Size(75, 23)
 		Me.cmdCancel.TabIndex = 11
@@ -172,19 +177,9 @@ Partial Class CRMPhotoImportHelper
 		Me.Label4.TabIndex = 14
 		Me.Label4.Text = "Number Invalid:"
 		'
-		'cmdCopyList
-		'
-		Me.cmdCopyList.Location = New System.Drawing.Point(166, 454)
-		Me.cmdCopyList.Name = "cmdCopyList"
-		Me.cmdCopyList.Size = New System.Drawing.Size(129, 36)
-		Me.cmdCopyList.TabIndex = 16
-		Me.cmdCopyList.Text = "Copy List"
-		Me.cmdCopyList.UseVisualStyleBackColor = True
-		Me.cmdCopyList.Visible = False
-		'
 		'Button1
 		'
-		Me.Button1.Location = New System.Drawing.Point(522, 428)
+		Me.Button1.Location = New System.Drawing.Point(552, 426)
 		Me.Button1.Name = "Button1"
 		Me.Button1.Size = New System.Drawing.Size(24, 22)
 		Me.Button1.TabIndex = 19
@@ -204,8 +199,58 @@ Partial Class CRMPhotoImportHelper
 		'
 		Me.txtImportFileFolderName.Location = New System.Drawing.Point(13, 428)
 		Me.txtImportFileFolderName.Name = "txtImportFileFolderName"
-		Me.txtImportFileFolderName.Size = New System.Drawing.Size(503, 20)
+		Me.txtImportFileFolderName.Size = New System.Drawing.Size(533, 20)
 		Me.txtImportFileFolderName.TabIndex = 17
+		'
+		'Label5
+		'
+		Me.Label5.AutoSize = True
+		Me.Label5.Location = New System.Drawing.Point(12, 290)
+		Me.Label5.Name = "Label5"
+		Me.Label5.Size = New System.Drawing.Size(66, 13)
+		Me.Label5.TabIndex = 20
+		Me.Label5.Text = "Picture Title:"
+		'
+		'cbPictureTitle
+		'
+		Me.cbPictureTitle.FormattingEnabled = True
+		Me.cbPictureTitle.Items.AddRange(New Object() {"2012 Child Photo", "2012 Health Photo", "2013 Child Photo"})
+		Me.cbPictureTitle.Location = New System.Drawing.Point(157, 287)
+		Me.cbPictureTitle.Name = "cbPictureTitle"
+		Me.cbPictureTitle.Size = New System.Drawing.Size(140, 21)
+		Me.cbPictureTitle.TabIndex = 22
+		'
+		'Label6
+		'
+		Me.Label6.AutoSize = True
+		Me.Label6.Location = New System.Drawing.Point(12, 343)
+		Me.Label6.Name = "Label6"
+		Me.Label6.Size = New System.Drawing.Size(139, 13)
+		Me.Label6.TabIndex = 23
+		Me.Label6.Text = "Blackbaud Photo Location: "
+		'
+		'txtBlackbaudPhotoLocation
+		'
+		Me.txtBlackbaudPhotoLocation.Location = New System.Drawing.Point(157, 340)
+		Me.txtBlackbaudPhotoLocation.Name = "txtBlackbaudPhotoLocation"
+		Me.txtBlackbaudPhotoLocation.Size = New System.Drawing.Size(389, 20)
+		Me.txtBlackbaudPhotoLocation.TabIndex = 24
+		'
+		'Label7
+		'
+		Me.Label7.AutoSize = True
+		Me.Label7.Location = New System.Drawing.Point(12, 317)
+		Me.Label7.Name = "Label7"
+		Me.Label7.Size = New System.Drawing.Size(119, 13)
+		Me.Label7.TabIndex = 25
+		Me.Label7.Text = "Max Photos Processed:"
+		'
+		'txtMaxPhotos
+		'
+		Me.txtMaxPhotos.Location = New System.Drawing.Point(157, 314)
+		Me.txtMaxPhotos.Name = "txtMaxPhotos"
+		Me.txtMaxPhotos.Size = New System.Drawing.Size(140, 20)
+		Me.txtMaxPhotos.TabIndex = 26
 		'
 		'CRMPhotoImportHelper
 		'
@@ -213,11 +258,16 @@ Partial Class CRMPhotoImportHelper
 		Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
 		Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
 		Me.CancelButton = Me.cmdCancel
-		Me.ClientSize = New System.Drawing.Size(554, 504)
+		Me.ClientSize = New System.Drawing.Size(589, 504)
+		Me.Controls.Add(Me.txtMaxPhotos)
+		Me.Controls.Add(Me.Label7)
+		Me.Controls.Add(Me.txtBlackbaudPhotoLocation)
+		Me.Controls.Add(Me.Label6)
+		Me.Controls.Add(Me.cbPictureTitle)
+		Me.Controls.Add(Me.Label5)
 		Me.Controls.Add(Me.Button1)
 		Me.Controls.Add(Me.Label3)
 		Me.Controls.Add(Me.txtImportFileFolderName)
-		Me.Controls.Add(Me.cmdCopyList)
 		Me.Controls.Add(Me.lblNumInvalid)
 		Me.Controls.Add(Me.Label4)
 		Me.Controls.Add(Me.lblStatus)
@@ -252,9 +302,14 @@ Partial Class CRMPhotoImportHelper
 	Friend WithEvents lblStatus As System.Windows.Forms.Label
 	Friend WithEvents lblNumInvalid As System.Windows.Forms.Label
 	Friend WithEvents Label4 As System.Windows.Forms.Label
-	Friend WithEvents cmdCopyList As System.Windows.Forms.Button
 	Friend WithEvents Button1 As System.Windows.Forms.Button
 	Friend WithEvents Label3 As System.Windows.Forms.Label
 	Friend WithEvents txtImportFileFolderName As System.Windows.Forms.TextBox
+	Friend WithEvents Label5 As System.Windows.Forms.Label
+	Friend WithEvents cbPictureTitle As System.Windows.Forms.ComboBox
+	Friend WithEvents Label6 As System.Windows.Forms.Label
+	Friend WithEvents txtBlackbaudPhotoLocation As System.Windows.Forms.TextBox
+	Friend WithEvents Label7 As System.Windows.Forms.Label
+	Friend WithEvents txtMaxPhotos As System.Windows.Forms.TextBox
 
 End Class

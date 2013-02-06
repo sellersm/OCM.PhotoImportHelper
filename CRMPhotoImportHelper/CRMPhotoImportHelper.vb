@@ -39,7 +39,7 @@ Public Class CRMPhotoImportHelper
 	Private _PaddingSide As Decimal = 0
 
 
-	Private Sub HeadshotCropper_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
+	Private Sub CRMPhotoImportHelper_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
 		e.Cancel = False
 		If Me._ProcessStatus <> ProcessStatusType.Stopped Then
 			If MsgBox("Headshots are currently being processed.  Are you sure you want to Exit?", MsgBoxStyle.YesNo, Me.Text) <> MsgBoxResult.Yes Then
@@ -51,10 +51,13 @@ Public Class CRMPhotoImportHelper
 	End Sub
 
 
-	Private Sub HeadshotCropper_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+	Private Sub CRMPhotoImportHelper_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
 
 		Me.lblChildID.Text = ""
 		Me.lblStatus.Text = ""
+
+		Me.txtMaxPhotos.Text = "5000"
+		Me.txtBlackbaudPhotoLocation.Text = "\\bbhcifs01\clientdata\Production\21195P\ChildPhotos" '"\\bbhcifs01\clientdata\staging\21195D\ChildPhotos" 
 
 		SetButtons()
 
@@ -74,9 +77,12 @@ Public Class CRMPhotoImportHelper
 
 	Private Sub cmdProcessFolder_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdProcessFolder.Click
 
-		Dim maxFilesToProcess As Integer = 5000
-		Dim pictureTitle As String = """BLACKBAUDHOST\Import21195P,21195P@imp123PWd"""	 '"2012 Health Update"
-		Dim fileLocation As String = "\\bbhcifs01\clientdata\Production\21195P\ChildPhotos\2012 Photos"
+
+		Dim parmsValid As Boolean = True
+
+		Dim pictureTitle As String = String.Empty
+		Dim maxFilesToProcess As Integer = 0
+		Dim fileLocation As String = Me.txtBlackbaudPhotoLocation.Text
 
 		' Check a (USA style) telephone number
 		Dim validFileNameFullbodyRegEx As New Regex("^[cC][0-9][0-9][0-9][0-9][0-9][0-9]$")
@@ -91,13 +97,32 @@ Public Class CRMPhotoImportHelper
 		Dim NumberOfFilesProcessed As Integer = 0
 		Dim NumberOfInvalidFiles As Integer = 0
 
-		Dim newFileName As String = ""
+		Dim newFileName As String = String.Empty
+		Dim ProcessedFiles As String = String.Empty
 
-		Dim ProcessedFiles As String = ""
 
-		If Not Directory.Exists(txtSourceFolderName.Text) Then
-			MsgBox("The Source Folder does not exist.  Please select a valid folder.", MsgBoxStyle.Critical, Me.Text & " - Processing Error")
+
+		If cbPictureTitle.Text = String.Empty Then
+			MsgBox("Missing Picture Title", MsgBoxStyle.Critical, "Please enter a Picture Title")
+			parmsValid = False
 		Else
+			pictureTitle = cbPictureTitle.Text	' 2012 Child Profile"	'"""BLACKBAUDHOST\Import21195P,21195P@imp123PWd"""	 '"2012 Health Update"
+		End If
+
+		If IsNumeric(Me.txtMaxPhotos.Text) Then
+			maxFilesToProcess = CInt(Me.txtMaxPhotos.Text)
+		Else
+			MsgBox("Please enter a number for the Maximum number of photos to process in this batch.", MsgBoxStyle.Critical, Me.Text & " - Processing Error")
+			parmsValid = False
+		End If
+
+		If Not Directory.Exists(Me.txtSourceFolderName.Text) Then
+			MsgBox("The Source Folder does not exist.  Please select a valid folder.", MsgBoxStyle.Critical, Me.Text & " - Processing Error")
+			parmsValid = False
+		End If
+
+
+		If parmsValid Then
 			Dim PathName As String = txtSourceFolderName.Text
 
 			If Not PathName.EndsWith("\") Then
@@ -154,10 +179,13 @@ Public Class CRMPhotoImportHelper
 
 
 				If Path.GetExtension(ImageFileWithPath).ToLower <> ".jpg" Then
-					Rename(ImageFileWithPath, ExceptionPath & "\" & Path.GetFileName(ImageFileWithPath))
-					NumberOfInvalidFiles += 1
-					exceptionFile.WriteLine(Path.GetFileName(ImageFileWithPath) & "," & "Not a jpg file")
-					'rtbMessage.AppendText(FileNameNoExt & vbTab & " - INVALID file name." & vbNewLine)
+					' skip thumbs.db file
+					If Path.GetFileName(ImageFileWithPath).ToLower <> "thumbs.db" Then
+						Rename(ImageFileWithPath, ExceptionPath & "\" & Path.GetFileName(ImageFileWithPath))
+						NumberOfInvalidFiles += 1
+						exceptionFile.WriteLine(Path.GetFileName(ImageFileWithPath) & "," & "Not a jpg file")
+						rtbMessage.AppendText(Path.GetFileName(ImageFileWithPath) & vbTab & "Not a jpg file" & vbNewLine)
+					End If
 				Else
 					Application.DoEvents()
 
@@ -169,27 +197,44 @@ Public Class CRMPhotoImportHelper
 					If validFileNameFullbodyRegEx.IsMatch(Path.GetFileNameWithoutExtension(ImageFileWithPath)) Then
 						NumberOfFullBody += 1
 						newFileName = Path.GetFileNameWithoutExtension(ImageFileWithPath).ToUpper & Path.GetExtension(ImageFileWithPath)
+						Try
+							Rename(ImageFileWithPath, ProcessedPath & "\" & newFileName)
+							importFile.WriteLine(Path.GetFileNameWithoutExtension(ImageFileWithPath).ToUpper & ",Child Photo - Full Body - Current," & pictureTitle & "," & newFileName & "," & fileLocation) 'ProcessedPath)
 
-						Rename(ImageFileWithPath, ProcessedPath & "\" & newFileName)
-						importFile.WriteLine(Path.GetFileNameWithoutExtension(ImageFileWithPath).ToUpper & ",Child Photo - Full Body - Current," & pictureTitle & "," & newFileName & "," & fileLocation) 'ProcessedPath)
+						Catch ex As Exception
+							NumberOfInvalidFiles += 1
+
+							exceptionFile.WriteLine(Path.GetFileName(ImageFileWithPath) & "," & "File move failed. " & ex.Message)
+							rtbMessage.AppendText(Path.GetFileName(ImageFileWithPath) & vbTab & "File move failed. " & ex.Message & vbNewLine)
+						End Try
+
 
 					ElseIf validFileNameHeadshotRegEx.IsMatch(Path.GetFileNameWithoutExtension(ImageFileWithPath)) Then
 						NumberOfFullBody += 1
 						newFileName = Path.GetFileNameWithoutExtension(ImageFileWithPath).ToUpper & Path.GetExtension(ImageFileWithPath)
 
-						Rename(ImageFileWithPath, ProcessedPath & "\" & newFileName)
-						importFile.WriteLine(Path.GetFileNameWithoutExtension(ImageFileWithPath).ToUpper.Substring(0, 7) & ",Child Photo - Headshot - Current," & pictureTitle & "," & newFileName & "," & fileLocation) 'ProcessedPath)
+						Try
+							Rename(ImageFileWithPath, ProcessedPath & "\" & newFileName)
+							importFile.WriteLine(Path.GetFileNameWithoutExtension(ImageFileWithPath).ToUpper.Substring(0, 7) & ",Child Photo - Headshot - Current," & pictureTitle & "," & newFileName & "," & fileLocation) 'ProcessedPath)
+						Catch ex As Exception
+							NumberOfInvalidFiles += 1
+
+							exceptionFile.WriteLine(Path.GetFileName(ImageFileWithPath) & "," & "File move failed. " & ex.Message)
+							rtbMessage.AppendText(Path.GetFileName(ImageFileWithPath) & vbTab & "File move failed. " & ex.Message & vbNewLine)
+						End Try
 					Else
 						Rename(ImageFileWithPath, ExceptionPath & "\" & Path.GetFileName(ImageFileWithPath))
 						NumberOfInvalidFiles += 1
 
 						exceptionFile.WriteLine(Path.GetFileName(ImageFileWithPath) & "," & "Invalid file name")
+						rtbMessage.AppendText(Path.GetFileName(ImageFileWithPath) & vbTab & "Invalid file name" & vbNewLine)
+
 					End If
 
 					lblNumInvalid.Text = NumberOfInvalidFiles.ToString
-					'rtbMessage.ScrollToCaret()
+					rtbMessage.ScrollToCaret()
 
-					'Me.Refresh()
+					Me.Refresh()
 
 					If NumberOfFilesProcessed = maxFilesToProcess Then
 						Exit For
@@ -217,49 +262,43 @@ Public Class CRMPhotoImportHelper
 			cmdProcessFolder.Enabled = False
 			cmdCancel.Visible = True
 			cmdPause.Visible = True
-			cmdCopyList.Visible = False
 		Else
 			cmdProcessFolder.Enabled = True
 			cmdCancel.Visible = False
 			cmdPause.Visible = False
-			If rtbMessage.TextLength > 0 Then
-				cmdCopyList.Visible = True
-			Else
-				cmdCopyList.Visible = False
-			End If
 		End If
 	End Sub
 
 
-	Private Function ResizeImage(ByVal imgToResize As Image, ByVal size As Size) As Image
-		Dim sourceWidth As Integer = imgToResize.Width
-		Dim sourceHeight As Integer = imgToResize.Height
+	'Private Function ResizeImage(ByVal imgToResize As Image, ByVal size As Size) As Image
+	'	Dim sourceWidth As Integer = imgToResize.Width
+	'	Dim sourceHeight As Integer = imgToResize.Height
 
-		Dim nPercent As Decimal = 0
-		Dim nPercentW As Decimal = 0
-		Dim nPercentH As Decimal = 0
+	'	Dim nPercent As Decimal = 0
+	'	Dim nPercentW As Decimal = 0
+	'	Dim nPercentH As Decimal = 0
 
-		nPercentW = (CType(size.Width, Decimal) / sourceWidth)
-		nPercentH = (CType(size.Height, Decimal) / sourceHeight)
+	'	nPercentW = (CType(size.Width, Decimal) / sourceWidth)
+	'	nPercentH = (CType(size.Height, Decimal) / sourceHeight)
 
-		If (nPercentH < nPercentW) Then
-			nPercent = nPercentH
-		Else
-			nPercent = nPercentW
-		End If
+	'	If (nPercentH < nPercentW) Then
+	'		nPercent = nPercentH
+	'	Else
+	'		nPercent = nPercentW
+	'	End If
 
-		Dim destWidth As Integer = CType((sourceWidth * nPercent), Integer)
-		Dim destHeight As Integer = CType((sourceHeight * nPercent), Integer)
+	'	Dim destWidth As Integer = CType((sourceWidth * nPercent), Integer)
+	'	Dim destHeight As Integer = CType((sourceHeight * nPercent), Integer)
 
-		Dim b As Bitmap = New Bitmap(destWidth, destHeight)
-		Dim g As Graphics = Graphics.FromImage(b)
-		g.InterpolationMode = InterpolationMode.HighQualityBicubic
+	'	Dim b As Bitmap = New Bitmap(destWidth, destHeight)
+	'	Dim g As Graphics = Graphics.FromImage(b)
+	'	g.InterpolationMode = InterpolationMode.HighQualityBicubic
 
-		g.DrawImage(imgToResize, 0, 0, destWidth, destHeight)
-		g.Dispose()
+	'	g.DrawImage(imgToResize, 0, 0, destWidth, destHeight)
+	'	g.Dispose()
 
-		Return b
-	End Function
+	'	Return b
+	'End Function
 
 	Private Sub cmdBrowseFolder_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdBrowseFolder.Click
 		Dim dlg As FolderBrowserDialog
@@ -305,13 +344,6 @@ Public Class CRMPhotoImportHelper
 
 	End Sub
 
-	Private Sub cmdCopyList_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCopyList.Click
-		rtbMessage.SelectAll()
-		rtbMessage.Copy()
-		MsgBox("The results list has been copied to clipboard.")
-	End Sub
-
-
 	Private Sub Button1_Click(sender As System.Object, e As System.EventArgs) Handles Button1.Click
 		Dim dlg As FolderBrowserDialog
 
@@ -323,4 +355,5 @@ Public Class CRMPhotoImportHelper
 
 		txtSourceFolderName.Focus()
 	End Sub
+
 End Class
