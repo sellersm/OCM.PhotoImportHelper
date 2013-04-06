@@ -84,7 +84,7 @@ Public Class CRMPhotoImportHelper
 		Dim maxFilesToProcess As Integer = 0
 		Dim fileLocation As String = Me.txtBlackbaudPhotoLocation.Text
 
-		' Check a (USA style) telephone number
+        ' Check a for child id (with and without the -H)
 		Dim validFileNameFullbodyRegEx As New Regex("^[cC][0-9][0-9][0-9][0-9][0-9][0-9]$")
 		Dim validFileNameHeadshotRegEx As New Regex("^[cC][0-9][0-9][0-9][0-9][0-9][0-9]-H$")
 
