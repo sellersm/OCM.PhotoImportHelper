@@ -17,7 +17,6 @@ Imports System.ComponentModel
 
 Public Class CRMPhotoImportHelper
 
-
 	<System.Runtime.InteropServices.DllImport("gdi32.dll")> _
 	Public Shared Function DeleteObject(ByVal hObject As IntPtr) As Boolean
 	End Function
@@ -66,6 +65,9 @@ Public Class CRMPhotoImportHelper
 	Private _pictureType As String = String.Empty
 	Private _defaultSourceFolder As String = String.Empty
 
+	Private _ftpFolderAlreadyFormatted As Boolean
+
+
 	' holds the image files:
 	Private _imageFiles As String() = {}
 
@@ -84,6 +86,7 @@ Public Class CRMPhotoImportHelper
 
 
 	Private Sub CRMPhotoImportHelper_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+		_ftpFolderAlreadyFormatted = False
 
 		Me.lblChildID.Text = ""
 		Me.lblStatus.Text = ""
@@ -129,6 +132,8 @@ Public Class CRMPhotoImportHelper
 
 		Dim pictureTitle As String = String.Empty
 		Dim maxFilesToProcess As Integer = 0
+		_ftpCRMPhotoFileLocation = _ftpCRMPhotoFileLocation + "\" + FormatFTPFolderName()
+		Me.txtBlackbaudPhotoLocation.Text = _ftpCRMPhotoFileLocation
 		Dim fileLocation As String = Me.txtBlackbaudPhotoLocation.Text
 
         ' Check a for child id (with and without the -H)
@@ -475,7 +480,7 @@ Public Class CRMPhotoImportHelper
 		_sftpClient.Password = _password
 		_sftpClient.WorkingDirectory = _workingdirectory
 		_sftpClient.UploadFileName = _uploadfile
-		_sftpClient.PhotoFTPFolderName = FormatFTPFolderName()
+		_sftpClient.PhotoFTPFolderName = _ftpPhotoFolderName  'FormatFTPFolderName()
 
 		' perform the transfer of a single file:
 		'_sftpClient.transferFile();
@@ -614,11 +619,14 @@ Public Class CRMPhotoImportHelper
 	End Sub
 
 	Private Function FormatFTPFolderName() As String
-		Dim todayDate As String = DateTime.Now.ToShortDateString()
-		todayDate = todayDate.Replace("/"c, "_"c)
-		_ftpPhotoFolderName = String.Format(_ftpPhotoFolderName & "{0}", todayDate).Trim()
-		LogThis(String.Format(vbCr & "FTP folder for Photos will be: {0}", _ftpPhotoFolderName))
-		Return _ftpPhotoFolderName
+		If _ftpFolderAlreadyFormatted = False Then
+			Dim todayDate As String = DateTime.Now.ToShortDateString()
+			todayDate = todayDate.Replace("/"c, "_"c)
+			_ftpPhotoFolderName = String.Format(_ftpPhotoFolderName & "{0}", todayDate).Trim()
+			LogThis(String.Format(vbCr & "FTP folder for Photos will be: {0}", _ftpPhotoFolderName))
+			_ftpFolderAlreadyFormatted = True
+			Return _ftpPhotoFolderName
+		End If
 	End Function
 
 	Private Sub GetConfigEntries()
