@@ -55,6 +55,7 @@ Partial Class CRMPhotoImportHelper
 		Me.imageFilesSelectedLabel = New System.Windows.Forms.Label()
 		Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog()
 		Me.lblFilesInProgress = New System.Windows.Forms.Label()
+		Me.lblEnvironment = New System.Windows.Forms.Label()
 		Me.SuspendLayout()
 		'
 		'lblNumProcessed
@@ -352,6 +353,14 @@ Partial Class CRMPhotoImportHelper
 		Me.lblFilesInProgress.Text = "About to transfer files..."
 		Me.lblFilesInProgress.Visible = False
 		'
+		'lblEnvironment
+		'
+		Me.lblEnvironment.AutoSize = True
+		Me.lblEnvironment.Location = New System.Drawing.Point(468, 13)
+		Me.lblEnvironment.Name = "lblEnvironment"
+		Me.lblEnvironment.Size = New System.Drawing.Size(0, 13)
+		Me.lblEnvironment.TabIndex = 35
+		'
 		'CRMPhotoImportHelper
 		'
 		Me.AcceptButton = Me.cmdProcessFolder
@@ -359,6 +368,7 @@ Partial Class CRMPhotoImportHelper
 		Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
 		Me.CancelButton = Me.cmdCancel
 		Me.ClientSize = New System.Drawing.Size(589, 549)
+		Me.Controls.Add(Me.lblEnvironment)
 		Me.Controls.Add(Me.lblFilesInProgress)
 		Me.Controls.Add(Me.imageFilesSelectedLabel)
 		Me.Controls.Add(Me.btnSelectFolder)
@@ -429,5 +439,6 @@ Partial Class CRMPhotoImportHelper
 	Friend WithEvents imageFilesSelectedLabel As System.Windows.Forms.Label
 	Friend WithEvents OpenFileDialog1 As System.Windows.Forms.OpenFileDialog
 	Friend WithEvents lblFilesInProgress As System.Windows.Forms.Label
+	Friend WithEvents lblEnvironment As System.Windows.Forms.Label
 
 End Class
