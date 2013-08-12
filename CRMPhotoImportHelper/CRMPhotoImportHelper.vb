@@ -664,6 +664,9 @@ Public Class CRMPhotoImportHelper
 		_ftpImportFileLocation = My.Settings.ImportFileLocation
 		_defaultSourceFolder = My.Settings.DefaultSourceFolder
 
+		'set the label to identify the current environment:
+		Me.lblEnvironment.Text = String.Format("will transfer to {0}", ftpEnvironment)
+
 		'Dim output As String = String.Format("ftpEnvironment: {0} _ftpCRMPhotoFileLocation: {1} _username: {2} _workingdirectory: {3} _ftpImportFileLocation: {4}", ftpEnvironment, _ftpCRMPhotoFileLocation, _username, _workingdirectory, _ftpImportFileLocation)
 		'MessageBox.Show(output)
 

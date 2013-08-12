@@ -65,7 +65,7 @@ Namespace My
         
         <Global.System.Configuration.ApplicationScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("DEV")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("PROD")>  _
         Public ReadOnly Property FTPEnvironment() As String
             Get
                 Return CType(Me("FTPEnvironment"),String)

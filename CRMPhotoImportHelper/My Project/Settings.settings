@@ -6,7 +6,7 @@
       <Value Profile="(Default)">C:\OCM\PhotoImports\ImportFiles</Value>
     </Setting>
     <Setting Name="FTPEnvironment" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">DEV</Value>
+      <Value Profile="(Default)">PROD</Value>
     </Setting>
     <Setting Name="DEV_BlackbaudPhotoFileLocation" Type="System.String" Scope="Application">
       <Value Profile="(Default)">\\bbhcifs01\clientdata\staging\21195D\ChildPhotos</Value>
