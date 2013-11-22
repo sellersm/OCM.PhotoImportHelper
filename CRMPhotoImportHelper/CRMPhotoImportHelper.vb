@@ -14,6 +14,8 @@ Imports System.Text.RegularExpressions
 Imports System.Reflection
 Imports SFTP_Test
 Imports System.ComponentModel
+Imports Microsoft.VisualBasic
+
 
 Public Class CRMPhotoImportHelper
 
@@ -22,6 +24,21 @@ Public Class CRMPhotoImportHelper
 	End Function
 
 	Private _ProcessStatus As ProcessStatusType = ProcessStatusType.Stopped
+
+	'  11/18/13 Memphis:  changes to implement TK-01168
+	'- ?? way to identify if this is a new photo or an older one:
+	'  •User will have to check an "Archive" checkbox if the photos are 'old'
+	'  •Update the CSV file definition to add the new fields & calculate the photo type based on "archive" bit
+	'  •Importer Title = 2013 Learning Letter
+	'  •Archive = not checked
+	'  •Change the attachment type to "Child PHoto - Full Body" and "Child Photo - Headshot".
+	'  •Add new attachment of "current" headshot and fullbody
+	'  •Add the title from the importer = 2013 Learning Letter
+	'  •Update the Photo year field = 2013
+	' - New Fields in the CSV file:
+	'   - Archive:   True or False
+	'   - Unusable: True or False 
+	'   - PhotoYear:  integer
 
 	Private Property ProcessStatus() As ProcessStatusType
 		Get
@@ -38,6 +55,7 @@ Public Class CRMPhotoImportHelper
 		Paused
 	End Enum
 
+#Region "PrivateVariables"
 	Private _TargetWidth As Integer = 0
 	Private _TargetHeight As Integer = 0
 	Private _PaddingTop As Decimal = 0
@@ -71,6 +89,19 @@ Public Class CRMPhotoImportHelper
 	' holds the image files:
 	Private _imageFiles As String() = {}
 
+	'holds the photo attachment type values:  gets used based on the Archive checkbox
+	Private Const _PHOTOATTACHMENTTYPE_BODYCURRENT As String = "Child Photo - Full Body - Current"
+	Private Const _PHOTOATTACHMENTTYPE_HEADSHOTCURRENT As String = "Child Photo - Headshot - Current"
+	Private Const _PHOTOATTACHMENTTYPE_BODY As String = "Child Photo - Full Body"
+	Private Const _PHOTOATTACHMENTTYPE_HEADSHOT As String = "Child Photo - Headshot"
+	Private Const _PHOTOATTACHMENTTYPE_BODY_UNUSABLE As String = "Child Photo - Full Body - Unusable"
+	Private Const _PHOTOATTACHMENTTYPE_HEADSHOT_UNUSABLE As String = "Child Photo - Headshot - Unusable"
+
+	'these will be populated by one of the above values, based on the photo type and archive bit
+	Private _headshotPhotoAttachmentType As String = String.Empty
+	Private _fullBodyPhotoAttachmentType As String = String.Empty
+
+#End Region
 
 
 	Private Sub CRMPhotoImportHelper_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
@@ -136,7 +167,7 @@ Public Class CRMPhotoImportHelper
 		Me.txtBlackbaudPhotoLocation.Text = _ftpCRMPhotoFileLocation
 		Dim fileLocation As String = Me.txtBlackbaudPhotoLocation.Text
 
-        ' Check a for child id (with and without the -H)
+		' Check a for child id (with and without the -H)
 		Dim validFileNameFullbodyRegEx As New Regex("^[cC][0-9][0-9][0-9][0-9][0-9][0-9]$")
 		Dim validFileNameHeadshotRegEx As New Regex("^[cC][0-9][0-9][0-9][0-9][0-9][0-9]-H$")
 
@@ -152,6 +183,10 @@ Public Class CRMPhotoImportHelper
 		Dim newFileName As String = String.Empty
 		Dim ProcessedFiles As String = String.Empty
 
+		' for new fields 11/18/13 Memphis:
+		Dim photoUnusable As Boolean = Me.unusableCheckBox.Checked
+		Dim archivePhoto As Boolean = Me.archiveCheckBox.Checked
+		Dim photoYear As Integer = Convert.ToInt32(Strings.Left(Me.cbPictureTitle.Text, 4))
 
 
 		If cbPictureTitle.Text = String.Empty Then
@@ -200,7 +235,7 @@ Public Class CRMPhotoImportHelper
 
 
 			Dim importFile As StreamWriter = New StreamWriter(importFilePathName & "ChildPhotoImport-" & DateTime.Now.ToString("yyyyMMddHHmmss") & ".csv")
-			importFile.WriteLine("ChildLookupID,AttachmentType,PictureTitle,FileName,FileLocation")
+			importFile.WriteLine("ChildLookupID,AttachmentType,PictureTitle,FileName,FileLocation,Archive,Unusable,PhotoYear")
 
 			Dim exceptionFile As StreamWriter = New StreamWriter(importFilePathName & "ChildPhotoImport-Exception-" & DateTime.Now.ToString("yyyyMMddHHmmss") & ".csv")
 			exceptionFile.WriteLine("FileName,Exception")
@@ -250,8 +285,19 @@ Public Class CRMPhotoImportHelper
 						NumberOfFullBody += 1
 						newFileName = Path.GetFileNameWithoutExtension(ImageFileWithPath).ToUpper & Path.GetExtension(ImageFileWithPath)
 						Try
+							'set the correct photo type based on archive checkbox value:
+							If archivePhoto = True Then
+								_fullBodyPhotoAttachmentType = _PHOTOATTACHMENTTYPE_BODY
+							Else
+								_fullBodyPhotoAttachmentType = _PHOTOATTACHMENTTYPE_BODYCURRENT
+							End If
+
+							If photoUnusable = True Then
+								_fullBodyPhotoAttachmentType = _PHOTOATTACHMENTTYPE_BODY_UNUSABLE
+							End If
+
 							Rename(ImageFileWithPath, ProcessedPath & "\" & newFileName)
-							importFile.WriteLine(Path.GetFileNameWithoutExtension(ImageFileWithPath).ToUpper & ",Child Photo - Full Body - Current," & pictureTitle & "," & newFileName & "," & fileLocation) 'ProcessedPath)
+							importFile.WriteLine(Path.GetFileNameWithoutExtension(ImageFileWithPath).ToUpper & "," & _fullBodyPhotoAttachmentType & "," & pictureTitle & "," & newFileName & "," & fileLocation & ", " & archivePhoto & "," & photoUnusable & "," & photoYear)	'ProcessedPath)
 
 						Catch ex As Exception
 							NumberOfInvalidFiles += 1
@@ -266,8 +312,19 @@ Public Class CRMPhotoImportHelper
 						newFileName = Path.GetFileNameWithoutExtension(ImageFileWithPath).ToUpper & Path.GetExtension(ImageFileWithPath)
 
 						Try
+							'set the correct photo type based on archive checkbox value:
+							If archivePhoto = True Then
+								_headshotPhotoAttachmentType = _PHOTOATTACHMENTTYPE_HEADSHOT
+							Else
+								_headshotPhotoAttachmentType = _PHOTOATTACHMENTTYPE_HEADSHOTCURRENT
+							End If
+
+							If photoUnusable = True Then
+								_headshotPhotoAttachmentType = _PHOTOATTACHMENTTYPE_HEADSHOT_UNUSABLE
+							End If
+
 							Rename(ImageFileWithPath, ProcessedPath & "\" & newFileName)
-							importFile.WriteLine(Path.GetFileNameWithoutExtension(ImageFileWithPath).ToUpper.Substring(0, 7) & ",Child Photo - Headshot - Current," & pictureTitle & "," & newFileName & "," & fileLocation) 'ProcessedPath)
+							importFile.WriteLine(Path.GetFileNameWithoutExtension(ImageFileWithPath).ToUpper.Substring(0, 7) & "," & _headshotPhotoAttachmentType & "," & pictureTitle & "," & newFileName & "," & fileLocation & ", " & archivePhoto & "," & photoUnusable & "," & photoYear) 'ProcessedPath)
 						Catch ex As Exception
 							NumberOfInvalidFiles += 1
 

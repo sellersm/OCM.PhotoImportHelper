@@ -56,6 +56,8 @@ Partial Class CRMPhotoImportHelper
 		Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog()
 		Me.lblFilesInProgress = New System.Windows.Forms.Label()
 		Me.lblEnvironment = New System.Windows.Forms.Label()
+		Me.archiveCheckBox = New System.Windows.Forms.CheckBox()
+		Me.unusableCheckBox = New System.Windows.Forms.CheckBox()
 		Me.SuspendLayout()
 		'
 		'lblNumProcessed
@@ -192,7 +194,7 @@ Partial Class CRMPhotoImportHelper
 		'
 		'Button1
 		'
-		Me.Button1.Location = New System.Drawing.Point(468, 289)
+		Me.Button1.Location = New System.Drawing.Point(551, 289)
 		Me.Button1.Name = "Button1"
 		Me.Button1.Size = New System.Drawing.Size(24, 22)
 		Me.Button1.TabIndex = 19
@@ -203,7 +205,7 @@ Partial Class CRMPhotoImportHelper
 		'Label3
 		'
 		Me.Label3.AutoSize = True
-		Me.Label3.Location = New System.Drawing.Point(323, 275)
+		Me.Label3.Location = New System.Drawing.Point(456, 275)
 		Me.Label3.Name = "Label3"
 		Me.Label3.Size = New System.Drawing.Size(90, 13)
 		Me.Label3.TabIndex = 18
@@ -212,9 +214,9 @@ Partial Class CRMPhotoImportHelper
 		'
 		'txtImportFileFolderName
 		'
-		Me.txtImportFileFolderName.Location = New System.Drawing.Point(324, 291)
+		Me.txtImportFileFolderName.Location = New System.Drawing.Point(457, 291)
 		Me.txtImportFileFolderName.Name = "txtImportFileFolderName"
-		Me.txtImportFileFolderName.Size = New System.Drawing.Size(137, 20)
+		Me.txtImportFileFolderName.Size = New System.Drawing.Size(89, 20)
 		Me.txtImportFileFolderName.TabIndex = 17
 		Me.txtImportFileFolderName.Text = "<this field is hidden>"
 		Me.txtImportFileFolderName.Visible = False
@@ -361,6 +363,26 @@ Partial Class CRMPhotoImportHelper
 		Me.lblEnvironment.Size = New System.Drawing.Size(0, 13)
 		Me.lblEnvironment.TabIndex = 35
 		'
+		'archiveCheckBox
+		'
+		Me.archiveCheckBox.AutoSize = True
+		Me.archiveCheckBox.Location = New System.Drawing.Point(321, 264)
+		Me.archiveCheckBox.Name = "archiveCheckBox"
+		Me.archiveCheckBox.Size = New System.Drawing.Size(62, 17)
+		Me.archiveCheckBox.TabIndex = 36
+		Me.archiveCheckBox.Text = "Archive"
+		Me.archiveCheckBox.UseVisualStyleBackColor = True
+		'
+		'unusableCheckBox
+		'
+		Me.unusableCheckBox.AutoSize = True
+		Me.unusableCheckBox.Location = New System.Drawing.Point(321, 291)
+		Me.unusableCheckBox.Name = "unusableCheckBox"
+		Me.unusableCheckBox.Size = New System.Drawing.Size(71, 17)
+		Me.unusableCheckBox.TabIndex = 37
+		Me.unusableCheckBox.Text = "Unusable"
+		Me.unusableCheckBox.UseVisualStyleBackColor = True
+		'
 		'CRMPhotoImportHelper
 		'
 		Me.AcceptButton = Me.cmdProcessFolder
@@ -368,6 +390,8 @@ Partial Class CRMPhotoImportHelper
 		Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
 		Me.CancelButton = Me.cmdCancel
 		Me.ClientSize = New System.Drawing.Size(589, 549)
+		Me.Controls.Add(Me.unusableCheckBox)
+		Me.Controls.Add(Me.archiveCheckBox)
 		Me.Controls.Add(Me.lblEnvironment)
 		Me.Controls.Add(Me.lblFilesInProgress)
 		Me.Controls.Add(Me.imageFilesSelectedLabel)
@@ -440,5 +464,7 @@ Partial Class CRMPhotoImportHelper
 	Friend WithEvents OpenFileDialog1 As System.Windows.Forms.OpenFileDialog
 	Friend WithEvents lblFilesInProgress As System.Windows.Forms.Label
 	Friend WithEvents lblEnvironment As System.Windows.Forms.Label
+	Friend WithEvents archiveCheckBox As System.Windows.Forms.CheckBox
+	Friend WithEvents unusableCheckBox As System.Windows.Forms.CheckBox
 
 End Class
