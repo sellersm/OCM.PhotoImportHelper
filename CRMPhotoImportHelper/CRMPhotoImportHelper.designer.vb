@@ -234,7 +234,7 @@ Partial Class CRMPhotoImportHelper
 		'cbPictureTitle
 		'
 		Me.cbPictureTitle.FormattingEnabled = True
-		Me.cbPictureTitle.Items.AddRange(New Object() {"2012 Child Photo", "2012 Health Photo", "2013 Child Photo"})
+		Me.cbPictureTitle.Items.AddRange(New Object() {"2011 Child Photo", "2012 Child Photo", "2012 Health Photo", "2013 Child Photo", "2013 Learning Photo", "2014 Child Photo"})
 		Me.cbPictureTitle.Location = New System.Drawing.Point(157, 264)
 		Me.cbPictureTitle.Name = "cbPictureTitle"
 		Me.cbPictureTitle.Size = New System.Drawing.Size(140, 21)
