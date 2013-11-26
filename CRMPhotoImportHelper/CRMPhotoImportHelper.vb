@@ -188,6 +188,11 @@ Public Class CRMPhotoImportHelper
 		Dim archivePhoto As Boolean = Me.archiveCheckBox.Checked
 		Dim photoYear As Integer = Convert.ToInt32(Strings.Left(Me.cbPictureTitle.Text, 4))
 
+		Dim headshotRow As String = String.Empty
+		Dim fullBodyRow As String = String.Empty
+
+		System.Diagnostics.Debug.WriteLine(photoUnusable)
+		System.Diagnostics.Debug.WriteLine(archivePhoto)
 
 		If cbPictureTitle.Text = String.Empty Then
 			MsgBox("Missing Picture Title", MsgBoxStyle.Critical, "Please enter a Picture Title")
@@ -297,7 +302,10 @@ Public Class CRMPhotoImportHelper
 							End If
 
 							Rename(ImageFileWithPath, ProcessedPath & "\" & newFileName)
-							importFile.WriteLine(Path.GetFileNameWithoutExtension(ImageFileWithPath).ToUpper & "," & _fullBodyPhotoAttachmentType & "," & pictureTitle & "," & newFileName & "," & fileLocation & ", " & archivePhoto & "," & photoUnusable & "," & photoYear)	'ProcessedPath)
+							fullBodyRow = String.Format("{0},{1},{2},{3},{4},{5},{6},{7}", Path.GetFileNameWithoutExtension(ImageFileWithPath).ToUpper, _fullBodyPhotoAttachmentType, pictureTitle, newFileName, fileLocation, Me.archiveCheckBox.Checked, Me.unusableCheckBox.Checked, photoYear)
+
+							importFile.WriteLine(fullBodyRow)
+							'importFile.WriteLine(Path.GetFileNameWithoutExtension(ImageFileWithPath).ToUpper & "," & _fullBodyPhotoAttachmentType & "," & pictureTitle & "," & newFileName & "," & fileLocation & ", " & archivePhoto & "," & If(photoUnusable, "True", "False") & "," & photoYear)	'ProcessedPath)
 
 						Catch ex As Exception
 							NumberOfInvalidFiles += 1
