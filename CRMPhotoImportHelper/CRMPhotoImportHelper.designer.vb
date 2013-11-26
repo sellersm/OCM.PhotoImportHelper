@@ -382,6 +382,7 @@ Partial Class CRMPhotoImportHelper
 		Me.unusableCheckBox.TabIndex = 37
 		Me.unusableCheckBox.Text = "Unusable"
 		Me.unusableCheckBox.UseVisualStyleBackColor = True
+		Me.unusableCheckBox.Visible = False
 		'
 		'CRMPhotoImportHelper
 		'
