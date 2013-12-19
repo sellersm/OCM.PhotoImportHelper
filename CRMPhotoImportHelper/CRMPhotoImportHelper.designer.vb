@@ -58,6 +58,7 @@ Partial Class CRMPhotoImportHelper
 		Me.lblEnvironment = New System.Windows.Forms.Label()
 		Me.archiveCheckBox = New System.Windows.Forms.CheckBox()
 		Me.unusableCheckBox = New System.Windows.Forms.CheckBox()
+		Me.resetButton = New System.Windows.Forms.Button()
 		Me.SuspendLayout()
 		'
 		'lblNumProcessed
@@ -384,6 +385,15 @@ Partial Class CRMPhotoImportHelper
 		Me.unusableCheckBox.UseVisualStyleBackColor = True
 		Me.unusableCheckBox.Visible = False
 		'
+		'resetButton
+		'
+		Me.resetButton.Location = New System.Drawing.Point(457, 363)
+		Me.resetButton.Name = "resetButton"
+		Me.resetButton.Size = New System.Drawing.Size(89, 36)
+		Me.resetButton.TabIndex = 38
+		Me.resetButton.Text = "Reset"
+		Me.resetButton.UseVisualStyleBackColor = True
+		'
 		'CRMPhotoImportHelper
 		'
 		Me.AcceptButton = Me.cmdProcessFolder
@@ -391,6 +401,7 @@ Partial Class CRMPhotoImportHelper
 		Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
 		Me.CancelButton = Me.cmdCancel
 		Me.ClientSize = New System.Drawing.Size(589, 549)
+		Me.Controls.Add(Me.resetButton)
 		Me.Controls.Add(Me.unusableCheckBox)
 		Me.Controls.Add(Me.archiveCheckBox)
 		Me.Controls.Add(Me.lblEnvironment)
@@ -467,5 +478,6 @@ Partial Class CRMPhotoImportHelper
 	Friend WithEvents lblEnvironment As System.Windows.Forms.Label
 	Friend WithEvents archiveCheckBox As System.Windows.Forms.CheckBox
 	Friend WithEvents unusableCheckBox As System.Windows.Forms.CheckBox
+	Friend WithEvents resetButton As System.Windows.Forms.Button
 
 End Class

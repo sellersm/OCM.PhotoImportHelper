@@ -24,6 +24,7 @@ Public Class CRMPhotoImportHelper
 	End Function
 
 	Private _ProcessStatus As ProcessStatusType = ProcessStatusType.Stopped
+	Private _resettingForm As Boolean = False
 
 	'  11/18/13 Memphis:  changes to implement TK-01168
 	'- ?? way to identify if this is a new photo or an older one:
@@ -186,13 +187,15 @@ Public Class CRMPhotoImportHelper
 		' for new fields 11/18/13 Memphis:
 		Dim photoUnusable As Boolean = Me.unusableCheckBox.Checked
 		Dim archivePhoto As Boolean = Me.archiveCheckBox.Checked
-		Dim photoYear As Integer = Convert.ToInt32(Strings.Left(Me.cbPictureTitle.Text, 4))
+		Dim photoYear As Integer = 0
 
 		Dim headshotRow As String = String.Empty
 		Dim fullBodyRow As String = String.Empty
 
 		System.Diagnostics.Debug.WriteLine(photoUnusable)
 		System.Diagnostics.Debug.WriteLine(archivePhoto)
+
+		_resettingForm = False
 
 		If cbPictureTitle.Text = String.Empty Then
 			MsgBox("Missing Picture Title", MsgBoxStyle.Critical, "Please enter a Picture Title")
@@ -213,13 +216,20 @@ Public Class CRMPhotoImportHelper
 			parmsValid = False
 		End If
 
+		Dim PathName As String = txtSourceFolderName.Text
+
+		If Not PathName.EndsWith("\") Then
+			PathName &= "\"
+		End If
+
+		'12/17/13 Memphis: check if there actually photos to process before continuing
+		If Directory.GetFiles(PathName, "*.jpg").Length() = 0 Then
+			MsgBox("There are no Child Photo files in the Source Folder.  Please select a valid folder.", MsgBoxStyle.Critical, Me.Text & " - Processing Error")
+			parmsValid = False
+		End If
 
 		If parmsValid Then
-			Dim PathName As String = txtSourceFolderName.Text
-
-			If Not PathName.EndsWith("\") Then
-				PathName &= "\"
-			End If
+			photoYear = Convert.ToInt32(Strings.Left(Me.cbPictureTitle.Text, 4))
 
 			Dim importFilePathName As String = txtImportFileFolderName.Text
 
@@ -368,7 +378,9 @@ Public Class CRMPhotoImportHelper
 
 			SetButtons()
 
-			lblStatus.Text = "Import file creation completed."
+			If parmsValid Then
+				lblStatus.Text = "Import file creation completed."
+			End If
 
 			' fill the image files array with the image files just created & indicate to user how many were selected for transfer:
 			GetImageFiles()
@@ -677,10 +689,12 @@ Public Class CRMPhotoImportHelper
 	Private Sub cbPictureTitle_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cbPictureTitle.SelectedIndexChanged
 		'set the folder name based on what picture type the user selected
 		'MessageBox.Show(cbPictureTitle.Items((cbPictureTitle.SelectedIndex)).ToString())
-		_pictureType = cbPictureTitle.Items((cbPictureTitle.SelectedIndex)).ToString()
-		'the folder name is something like this: 2013_Child_Photos_
-		_ftpPhotoFolderName = _pictureType.Replace(" ", "_") + "s_"
-		'MessageBox.Show(FormatFTPFolderName())
+		If _resettingForm = False Then
+			_pictureType = cbPictureTitle.Items((cbPictureTitle.SelectedIndex)).ToString()
+			'the folder name is something like this: 2013_Child_Photos_
+			_ftpPhotoFolderName = _pictureType.Replace(" ", "_") + "s_"
+			'MessageBox.Show(FormatFTPFolderName())
+		End If
 	End Sub
 
 	Private Function FormatFTPFolderName() As String
@@ -738,4 +752,21 @@ Public Class CRMPhotoImportHelper
 	End Sub
 
 
+
+	Private Sub resetButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles resetButton.Click
+		'resets all the fields/buttons so user doesn't have to close form to perform another run:
+		_resettingForm = True
+		SetButtons()
+		btnTransfer.Enabled = False
+		btnSelectFolder.Enabled = False
+		_numberOfFiles = 0
+		imageFilesSelectedLabel.Text = String.Format("{0} image files ready to transfer.", _numberOfFiles)
+		progressBar1.Value = 0
+		overallProgressBar.Value = 0
+		lblStatus.Text = String.Empty
+		Me.cbPictureTitle.SelectedIndex = -1
+		lblFilesInProgress.Visible = False
+		lblFilesInProgress.Text = String.Empty
+		Me.txtSourceFolderName.Text = _defaultSourceFolder
+	End Sub
 End Class
