@@ -80,6 +80,8 @@ Public Class CRMPhotoImportHelper
 	Private _numberOfFiles As Integer = 0
 	Private _ftpImportFileLocation As String = String.Empty
 	Private _ftpCRMPhotoFileLocation As String = String.Empty
+	Private _formattedFTPFolderName As String = String.Empty
+	Private _needsFTPFolderNameReformat As Boolean = False
 
 	Private _pictureType As String = String.Empty
 	Private _defaultSourceFolder As String = String.Empty
@@ -135,6 +137,7 @@ Public Class CRMPhotoImportHelper
 		' user can't transfer until they select everything else & process the folder:
 		btnTransfer.Enabled = False
 		btnSelectFolder.Enabled = False
+		_needsFTPFolderNameReformat = False
 
 		GetConfigEntries()
 
@@ -160,13 +163,47 @@ Public Class CRMPhotoImportHelper
 
 	Private Sub cmdProcessFolder_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdProcessFolder.Click
 
-		Dim parmsValid As Boolean = True
-
 		Dim pictureTitle As String = String.Empty
 		Dim maxFilesToProcess As Integer = 0
-		_ftpCRMPhotoFileLocation = _ftpCRMPhotoFileLocation + "\" + FormatFTPFolderName()
-		Me.txtBlackbaudPhotoLocation.Text = _ftpCRMPhotoFileLocation
+		Dim parmsValid As Boolean = True
 		Dim fileLocation As String = Me.txtBlackbaudPhotoLocation.Text
+
+		'_ftpFolderAlreadyFormatted = False
+
+		''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+		' Memphis 10/24/14
+		' NOTE:  Need to figure out how to reset the _ftpPhotoFolderName value when the user
+		'        changes the Picture Title after clicking the Reset button!
+		'         - the _ftpCRMPhotoFileLocation value needs to be reset if the picture title changes!
+		''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+		'must ensure the user has selected a Picture Title before proceeding:
+		If String.IsNullOrEmpty(_ftpPhotoFolderName) Then
+			MsgBox("Missing Picture Title", MsgBoxStyle.Critical, "Please enter a Picture Title")
+		Else
+			'Memphis 10/24/14: can only format the folder name one time, no matter how many times user Resets the form!
+			If String.IsNullOrEmpty(_formattedFTPFolderName) OrElse _needsFTPFolderNameReformat Then
+				'reset the flag so it formats the folder name:
+				_ftpFolderAlreadyFormatted = False
+				_formattedFTPFolderName = FormatFTPFolderName()
+				If fileLocation.EndsWith("\") Then
+					'strip out the ending backslash folder separator character
+					'_ftpCRMPhotoFileLocation = _ftpCRMPhotoFileLocation.Substring(0, _ftpCRMPhotoFileLocation.IndexOf("\"))
+					fileLocation = fileLocation.Substring(0, _ftpCRMPhotoFileLocation.IndexOf("\"))
+				End If
+				'_ftpCRMPhotoFileLocation = _ftpCRMPhotoFileLocation + "\" + _formattedFTPFolderName
+				fileLocation = _ftpCRMPhotoFileLocation + "\" + _formattedFTPFolderName
+				'Me.txtBlackbaudPhotoLocation.Text = _ftpCRMPhotoFileLocation
+				Me.txtBlackbaudPhotoLocation.Text = fileLocation
+				'fileLocation = Me.txtBlackbaudPhotoLocation.Text
+			End If
+		End If
+
+
+		'If _ftpFolderAlreadyFormatted = True Then
+		'	_ftpCRMPhotoFileLocation = _ftpCRMPhotoFileLocation + "\" + FormatFTPFolderName()
+		'	Me.txtBlackbaudPhotoLocation.Text = _ftpCRMPhotoFileLocation
+		'End If
 
 		' Check a for child id (with and without the -H)
 		Dim validFileNameFullbodyRegEx As New Regex("^[cC][0-9][0-9][0-9][0-9][0-9][0-9]$")
@@ -768,5 +805,7 @@ Public Class CRMPhotoImportHelper
 		lblFilesInProgress.Visible = False
 		lblFilesInProgress.Text = String.Empty
 		Me.txtSourceFolderName.Text = _defaultSourceFolder
+		_resettingForm = False
+		_needsFTPFolderNameReformat = True
 	End Sub
 End Class
